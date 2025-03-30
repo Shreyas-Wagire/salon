@@ -95,6 +95,7 @@ export interface InventoryItem {
   lowStockAlert: number;
   supplier?: string;
   lastRestocked: string;
+  imageUrl?: string;
 }
 
 // User Types

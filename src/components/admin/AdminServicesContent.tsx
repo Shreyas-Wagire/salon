@@ -20,12 +20,14 @@ import {
   SelectValue 
 } from "@/components/ui/select";
 import { Service } from "@/types";
-import { Plus, Search, Filter } from "lucide-react";
+import { Plus, Search, Filter, Edit, Trash2 } from "lucide-react";
 import { useServicesStore } from "@/store/servicesStore";
 
 export function AdminServicesContent() {
-  const { services, addService } = useServicesStore();
+  const { services, addService, updateService, deleteService } = useServicesStore();
   const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
+  const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
+  const [selectedService, setSelectedService] = useState<Service | null>(null);
   const [filterCategory, setFilterCategory] = useState<string>("");
   const [sortBy, setSortBy] = useState<string>("");
   const [searchQuery, setSearchQuery] = useState("");
@@ -81,7 +83,12 @@ export function AdminServicesContent() {
     }));
   };
   
-  const handleAddService = () => {
+  const handleAddService = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!formData.name || !formData.category || formData.price <= 0 || formData.duration <= 0) {
+      alert("Please fill in all required fields with valid values");
+      return;
+    }
     addService(formData);
     setIsAddDialogOpen(false);
     setFormData({
@@ -91,6 +98,42 @@ export function AdminServicesContent() {
       price: 0,
       category: "",
     });
+  };
+
+  const handleEditService = (service: Service) => {
+    setSelectedService(service);
+    setFormData({
+      name: service.name,
+      description: service.description,
+      duration: service.duration,
+      price: service.price,
+      category: service.category,
+    });
+    setIsEditDialogOpen(true);
+  };
+
+  const handleUpdateService = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!selectedService || !formData.name || !formData.category || formData.price <= 0 || formData.duration <= 0) {
+      alert("Please fill in all required fields with valid values");
+      return;
+    }
+    updateService(selectedService.id, formData);
+    setIsEditDialogOpen(false);
+    setSelectedService(null);
+    setFormData({
+      name: "",
+      description: "",
+      duration: 30,
+      price: 0,
+      category: "",
+    });
+  };
+
+  const handleDeleteService = (id: string) => {
+    if (window.confirm("Are you sure you want to delete this service?")) {
+      deleteService(id);
+    }
   };
 
   return (
@@ -183,7 +226,25 @@ export function AdminServicesContent() {
         {filteredServices.map((service) => (
           <Card key={service.id}>
             <CardHeader>
-              <CardTitle>{service.name}</CardTitle>
+              <CardTitle className="flex items-center justify-between">
+                <span>{service.name}</span>
+                <div className="flex gap-2">
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    onClick={() => handleEditService(service)}
+                  >
+                    <Edit className="h-4 w-4" />
+                  </Button>
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    onClick={() => handleDeleteService(service.id)}
+                  >
+                    <Trash2 className="h-4 w-4" />
+                  </Button>
+                </div>
+              </CardTitle>
             </CardHeader>
             <CardContent>
               <p className="text-slate-500 mb-4">{service.description}</p>
@@ -211,61 +272,140 @@ export function AdminServicesContent() {
           <DialogHeader>
             <DialogTitle>Add New Service</DialogTitle>
           </DialogHeader>
-          <div className="grid gap-4 py-4">
-            <div className="grid gap-2">
+          <form onSubmit={handleAddService} className="space-y-4">
+            <div className="space-y-2">
               <Label htmlFor="name">Name</Label>
               <Input
                 id="name"
                 name="name"
                 value={formData.name}
                 onChange={handleInputChange}
+                required
               />
             </div>
-            <div className="grid gap-2">
+            <div className="space-y-2">
               <Label htmlFor="description">Description</Label>
               <Input
                 id="description"
                 name="description"
                 value={formData.description}
                 onChange={handleInputChange}
+                required
               />
             </div>
-            <div className="grid gap-2">
+            <div className="space-y-2">
               <Label htmlFor="duration">Duration (minutes)</Label>
               <Input
                 id="duration"
                 name="duration"
                 type="number"
+                min={1}
                 value={formData.duration}
                 onChange={handleInputChange}
+                required
               />
             </div>
-            <div className="grid gap-2">
+            <div className="space-y-2">
               <Label htmlFor="price">Price</Label>
               <Input
                 id="price"
                 name="price"
                 type="number"
+                min={0}
+                step="0.01"
                 value={formData.price}
                 onChange={handleInputChange}
+                required
               />
             </div>
-            <div className="grid gap-2">
+            <div className="space-y-2">
               <Label htmlFor="category">Category</Label>
               <Input
                 id="category"
                 name="category"
                 value={formData.category}
                 onChange={handleInputChange}
+                required
               />
             </div>
-          </div>
-          <DialogFooter>
-            <Button variant="outline" onClick={() => setIsAddDialogOpen(false)}>
-              Cancel
-            </Button>
-            <Button onClick={handleAddService}>Add Service</Button>
-          </DialogFooter>
+            <DialogFooter>
+              <Button type="button" variant="outline" onClick={() => setIsAddDialogOpen(false)}>
+                Cancel
+              </Button>
+              <Button type="submit">Add Service</Button>
+            </DialogFooter>
+          </form>
+        </DialogContent>
+      </Dialog>
+
+      <Dialog open={isEditDialogOpen} onOpenChange={setIsEditDialogOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Edit Service</DialogTitle>
+          </DialogHeader>
+          <form onSubmit={handleUpdateService} className="space-y-4">
+            <div className="space-y-2">
+              <Label htmlFor="name">Name</Label>
+              <Input
+                id="name"
+                name="name"
+                value={formData.name}
+                onChange={handleInputChange}
+                required
+              />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="description">Description</Label>
+              <Input
+                id="description"
+                name="description"
+                value={formData.description}
+                onChange={handleInputChange}
+                required
+              />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="duration">Duration (minutes)</Label>
+              <Input
+                id="duration"
+                name="duration"
+                type="number"
+                min={1}
+                value={formData.duration}
+                onChange={handleInputChange}
+                required
+              />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="price">Price</Label>
+              <Input
+                id="price"
+                name="price"
+                type="number"
+                min={0}
+                step="0.01"
+                value={formData.price}
+                onChange={handleInputChange}
+                required
+              />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="category">Category</Label>
+              <Input
+                id="category"
+                name="category"
+                value={formData.category}
+                onChange={handleInputChange}
+                required
+              />
+            </div>
+            <DialogFooter>
+              <Button type="button" variant="outline" onClick={() => setIsEditDialogOpen(false)}>
+                Cancel
+              </Button>
+              <Button type="submit">Save Changes</Button>
+            </DialogFooter>
+          </form>
         </DialogContent>
       </Dialog>
     </div>

@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
-import { Scissors } from "lucide-react";
+import { Scissors, Package } from "lucide-react";
 
 export function Navbar() {
   return (
@@ -17,6 +17,9 @@ export function Navbar() {
         <div className="flex gap-4">
           <Link href="/services">
             <Button variant="ghost">Services</Button>
+          </Link>
+          <Link href="/inventory">
+            <Button variant="ghost">Products</Button>
           </Link>
           <Link href="/about">
             <Button variant="ghost">About</Button>

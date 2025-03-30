@@ -12,7 +12,8 @@ import {
   BarChart4, 
   Users, 
   Settings, 
-  LogOut 
+  LogOut,
+  Scissors
 } from "lucide-react";
 import { signOut } from "next-auth/react";
 
@@ -30,6 +31,11 @@ export function AdminNavbar() {
       icon: <LayoutDashboard className="h-5 w-5" />,
       label: "Dashboard",
       href: "/admin/dashboard",
+    },
+    {
+      icon: <Scissors className="h-5 w-5" />,
+      label: "Services",
+      href: "/admin/services",
     },
     {
       icon: <Calendar className="h-5 w-5" />,
