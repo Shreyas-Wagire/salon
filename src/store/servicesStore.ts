@@ -15,7 +15,7 @@ const sampleServices: Service[] = [
   {
     id: "1",
     name: "Haircut",
-    description: "Basic haircut service",
+    description: "Professional haircut and styling",
     duration: 30,
     price: 25.00,
     category: "Hair",
@@ -23,7 +23,7 @@ const sampleServices: Service[] = [
   {
     id: "2",
     name: "Hair Color",
-    description: "Full hair coloring service",
+    description: "Full hair coloring service with premium products",
     duration: 120,
     price: 85.00,
     category: "Hair",
@@ -31,10 +31,26 @@ const sampleServices: Service[] = [
   {
     id: "3",
     name: "Manicure",
-    description: "Basic manicure service",
+    description: "Professional nail care and polish",
     duration: 45,
     price: 35.00,
     category: "Nails",
+  },
+  {
+    id: "4",
+    name: "Pedicure",
+    description: "Relaxing foot care and polish",
+    duration: 60,
+    price: 45.00,
+    category: "Nails",
+  },
+  {
+    id: "5",
+    name: "Facial",
+    description: "Deep cleansing facial treatment",
+    duration: 60,
+    price: 75.00,
+    category: "Skin",
   },
 ];
 
@@ -74,4 +90,4 @@ export const useServicesStore = create<ServicesState>()(
       name: "services-storage",
     }
   )
-); 
+);
